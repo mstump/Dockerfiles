@@ -1,11 +1,39 @@
 version: "3.9"
 services:
+
   webapp2:
     build: webapp2
     ports:
       - "8080:80"
+    links:
+      - "postgis:postgis"
+
   aprsd:
     build: aprsd
     ports:
       - "8081:8081"
+    links:
+      - "postgis:postgis"
 
+  postgis:
+    image: postgis/postgis:10-3.2
+    ports:
+      - "8081:8081"
+    environment:
+      # should move this to a .env file and change the PW to something else if actually using it in prod
+      - POSTGRES_PASSWORD=polaric
+
+  direwolf:
+    image: w2bro/direwolf:1.2.0
+    ports:
+      - "8001:8001"
+    devices:
+      - "/dev/bus/usb/001/004:/dev/bus/usb/001/004"
+      - "/dev/snd:/dev/snd"
+    environment:
+      # see https://hub.docker.com/r/w2bro/direwolf and https://github.com/w2bro/docker-direwolf for reference
+      # should change to your specific settings
+      - CALLSIGN=N0CALL-10
+      - LATITUDE=42^37.14N
+      - LONGITUDE=071^20.83W
+      - ADEVICE=
